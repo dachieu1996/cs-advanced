@@ -11,6 +11,64 @@
 * Use a delegate when:
   * An evening design pattern is used.
   * The caller doesn't need to access other properties or methods on object implementing the method.
+```cs
+class Program
+{
+    static void Main(string[] args)
+    {
+        var processor = new PhotoProcessor();
+        var filter = new PhotoFilters();
+            
+        // Custom Delegate
+        PhotoProcessor.PhotoFilterHandler filterHanlder = filter.ApplyBrightness;
+        filterHanlder += filter.ApplyContrast;
+        filterHanlder += RemoveRedEyeFilter;
+        Console.WriteLine("------------Custom Delegate------------");
+        processor.Process("example.com", filterHanlder);
+
+        // Action Delegate
+        Action<Photo> filterHandler = filter.Resize;
+        filterHandler += RemoveRedEyeFilter;
+        Console.WriteLine("------------Action Delegate------------");
+        processor.Process("example.com", filterHandler);
+    }
+
+    static void RemoveRedEyeFilter(Photo photo)
+    {
+        Console.WriteLine("Remove Red Eye");
+    }
+}
+```
+```cs
+public class PhotoProcessor
+{
+    public delegate void PhotoFilterHandler(Photo photo);
+    public void Process(string path, PhotoFilterHandler filterHandler)
+    {
+        var photo = Photo.Load(path);
+
+        //var filter = new PhotoFilters();
+        //filter.ApplyBrightness(photo);
+        //filter.ApplyContrast(photo);
+        //filter.Resize(photo);
+
+        filterHandler(photo);
+    }
+
+    public void Process(string path, Action<Photo> filterHandler)
+    {
+        var photo = Photo.Load(path);
+
+        //var filter = new PhotoFilters();
+        //filter.ApplyBrightness(photo);
+        //filter.ApplyContrast(photo);
+        //filter.Resize(photo);
+
+        filterHandler(photo);
+    }
+}
+```
+
 
 ## Lamda Expressions
 ```cs
